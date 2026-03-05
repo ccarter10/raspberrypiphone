@@ -1302,7 +1302,7 @@
 #endif
 
 /** Driver for /dev/fb */
-#define LV_USE_LINUX_FBDEV      0
+#define LV_USE_LINUX_FBDEV      1
 #if LV_USE_LINUX_FBDEV
     #define LV_LINUX_FBDEV_BSD           0
     #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
@@ -1376,7 +1376,7 @@
 #endif /*LV_USE_LOVYAN_GFX*/
 
 /** Driver for evdev input devices */
-#define LV_USE_EVDEV    0
+#define LV_USE_EVDEV    1
 
 /** Driver for libinput input devices */
 #define LV_USE_LIBINPUT    0

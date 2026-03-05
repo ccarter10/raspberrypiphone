@@ -27,5 +27,8 @@ void* radio_thread_func(void* arg);
 void run_ui_loop(void);
 void build_phone_ui(void);
 
+# Append the new function to the bottom of piphone.h
+echo "int display_init(void);" >> piphone.h
+
 #endif
-EOF
+EOFint touch_init(void);

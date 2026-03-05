@@ -5,6 +5,7 @@ cat << 'EOF' > main.c
 #include <pthread.h>
 #include <string.h>
 #include "piphone.h"
+#include "lvgl/lvgl.h" // NEW: Graphics Engine Include
 
 // Global File Descriptors (The "Pipes" to our hardware)
 int modem_fd = -1;
@@ -41,20 +42,15 @@ void* radio_thread_func(void* arg) {
 
 // --- 2. THE USER INTERFACE LOOP ---
 void run_ui_loop(void) {
-    printf("[UI] System online. Press Ctrl+C to shutdown.\n");
+    printf("[UI] Booting Graphical Interface...\n");
+    
+    // Draw the keypad on the physical screen!
+    build_phone_ui(); 
     
     while(1) {
-        float current_bat = 0.0;
-        
-        // Ask the physical I2C chip for the battery voltage
-        if (battery_fd > 0) {
-            current_bat = get_battery_percentage(battery_fd);
-        }
-
-        // Print the simulated screen output
-        printf("[UI] Battery: %.1f%% | Signal: 4G LTE\n", current_bat);
-        
-        sleep(5); // Update the screen every 5 seconds
+        // The Graphics Heartbeat (Runs forever)
+        lv_timer_handler(); // Tell LVGL to redraw the screen and calculate math
+        usleep(5000);       // Sleep for 5 milliseconds to save battery
     }
 }
 
@@ -76,6 +72,15 @@ int main() {
     // 3. Wake up the SIM7600 4G Modem
     modem_fd = modem_init("/dev/ttyUSB0"); 
     
+    // 4. Wake up the physical screen!
+    if (display_init() < 0) {
+        printf("Screen failed to initialize.\n");
+        exit(1);
+    }
+    
+    // 5. Wake up the physical touchscreen digitizer!
+    touch_init();
+
     // --- TESTING BLOCK (Uncomment when you want to fire a real text) ---
     /*
     if (modem_fd > 0) {
@@ -86,11 +91,11 @@ int main() {
     */
     // -------------------------------------------------------------------
 
-    // 4. Start the background thread to listen to the radio
+    // 5. Start the background thread to listen to the radio
     pthread_t radio_thread;
     pthread_create(&radio_thread, NULL, radio_thread_func, NULL);
     
-    // 5. Hand control over to the Screen/UI loop
+    // 6. Hand control over to the Screen/UI loop
     run_ui_loop();
 
     return 0;
