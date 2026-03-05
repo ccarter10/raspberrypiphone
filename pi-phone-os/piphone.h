@@ -25,6 +25,7 @@ void send_sms(int fd, const char* phone_number, const char* message);
 /* --- 4. SYSTEM & UI FUNCTIONS --- */
 void* radio_thread_func(void* arg);
 void run_ui_loop(void);
+void build_phone_ui(void);
 
 #endif
 EOF
