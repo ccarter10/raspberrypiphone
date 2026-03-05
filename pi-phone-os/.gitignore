@@ -1,0 +1,5 @@
+# 6. GITIGNORE
+echo "piphone" > .gitignore
+echo "*.o" >> .gitignore
+
+echo "Done! Type 'ls' to see your new Pi Zero 2 W OS workspace."

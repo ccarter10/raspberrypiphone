@@ -1,0 +1,1 @@
+echo -e "CC = gcc\nCFLAGS = -Wall -Wextra -O2\nLDFLAGS = -lpthread\n\npiphone: main.c hw_init.c modem.c battery.c\n\t\$(CC) \$(CFLAGS) main.c hw_init.c modem.c battery.c -o piphone \$(LDFLAGS)\n\nclean:\n\trm -f piphone" > Makefile
