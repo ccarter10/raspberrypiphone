@@ -1,5 +1,3 @@
-# 3. THE RADIO DRIVER (modem.c)
-cat << 'EOF' > modem.c
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
@@ -70,20 +68,3 @@ void send_sms(int fd, const char* phone_number, const char* message) {
     write(fd, &ctrl_z, 1);
     printf("[SMS] Dispatched!\n");
 }
-
-// 1. The Callback Function (What happens when clicked)
-static void dial_event_handler(lv_event_t * e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    
-    if(code == LV_EVENT_CLICKED) {
-        printf("[UI] Dial button pressed!\n");
-        
-        // Call the radio function from our piphone.h blueprint!
-        make_call(modem_fd, "+12345678900"); 
-    }
-}
-
-// 2. Attach the callback to the button (Add this to your build_phone_ui function)
-lv_obj_add_event_cb(dial_btn, dial_event_handler, LV_EVENT_ALL, NULL);
-
-EOF

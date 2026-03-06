@@ -6,22 +6,22 @@
 #include <linux/i2c-dev.h>
 #include "piphone.h"
 
-// The MAX17048 Battery Fuel Gauge Address
-#define BATTERY_I2C_ADDR 0x36 
+/* MAX17048 Battery Fuel Gauge I2C address */
+#define BATTERY_I2C_ADDR 0x36
 
-// The specific "Memory Register" inside the chip that holds the percentage
-#define SOC_REGISTER 0x04     
+/* State of Charge register */
+#define SOC_REGISTER     0x04
 
 int battery_init(void) {
     int fd;
-    
-    // 1. Open the I2C bus (The physical pins 3 and 5 on the Pi)
+
+    /* Open the I2C bus (pins 3 and 5 on the Pi) */
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
         printf("[POWER] Error: Could not open I2C bus. Is it enabled in raspi-config?\n");
         return -1;
     }
 
-    // 2. Tell the Pi which chip we want to talk to (Address 0x36)
+    /* Select the fuel gauge chip at address 0x36 */
     if (ioctl(fd, I2C_SLAVE, BATTERY_I2C_ADDR) < 0) {
         printf("[POWER] Error: Could not find the Battery Chip at 0x36.\n");
         close(fd);
@@ -33,26 +33,24 @@ int battery_init(void) {
 }
 
 float get_battery_percentage(int fd) {
-    if (fd < 0) return 0.0;
+    if (fd < 0) return 0.0f;
 
     unsigned char buffer[2];
-    
-    // 1. Tell the chip we want to read the SOC (State of Charge) register
+
+    /* Request the SOC register */
     buffer[0] = SOC_REGISTER;
     if (write(fd, buffer, 1) != 1) {
-        return -1.0; // Read error
+        return -1.0f;
     }
 
-    // 2. The chip replies with 2 bytes of data
+    /* Read 2 bytes back from the chip */
     if (read(fd, buffer, 2) != 2) {
-        return -1.0; // Read error
+        return -1.0f;
     }
 
-    // 3. Bit-math! Combine the two bytes to get the real percentage
+    /* Combine bytes; chip returns percentage scaled by 256 */
     int raw_percent = (buffer[0] << 8) | buffer[1];
-    
-    // The chip returns the percentage scaled by 256. 
-    float final_percent = (float)raw_percent / 256.0;
-    
+    float final_percent = (float)raw_percent / 256.0f;
+
     return final_percent;
 }
