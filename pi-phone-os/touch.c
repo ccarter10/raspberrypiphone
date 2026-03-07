@@ -1,23 +1,30 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "lvgl/lvgl.h"
 #include "piphone.h"
 
-/* On Linux, the primary touchscreen digitizer is usually event0 */
+/* ============================================================
+ *  TOUCH — LVGL evdev driver bound to touchscreen digitizer
+ *
+ *  The primary touchscreen is usually /dev/input/event0.
+ *  If you have multiple input devices, check with:
+ *    cat /proc/bus/input/devices
+ *  Look for your touchscreen and note its event number.
+ *
+ *  Touch failure is non-fatal — the system boots without it.
+ * ============================================================ */
+
 #define TOUCH_DEVICE "/dev/input/event0"
 
 int touch_init(void) {
-    printf("[TOUCH] Connecting to digitizer at %s...\n", TOUCH_DEVICE);
+    printf("[TOUCH] Connecting to %s...\n", TOUCH_DEVICE);
 
-    /* Create an LVGL input device pointing to the physical touchscreen */
     lv_indev_t *indev = lv_evdev_create(LV_INDEV_TYPE_POINTER, TOUCH_DEVICE);
-
     if (indev == NULL) {
-        printf("[WARNING] Touchscreen not found at %s.\n", TOUCH_DEVICE);
-        printf("[WARNING] (Running in WSL/desktop? This is expected.)\n");
+        printf("[TOUCH] Touchscreen not found at %s.\n", TOUCH_DEVICE);
+        printf("[TOUCH] Continuing without touch input.\n");
         return -1;
     }
 
-    printf("[TOUCH] Digitizer connected and calibrated.\n");
+    printf("[TOUCH] Touchscreen ready.\n");
     return 0;
 }
