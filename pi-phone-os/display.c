@@ -1,24 +1,34 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "lvgl/lvgl.h"
 #include "piphone.h"
 
-int display_init(void) {
-    printf("[DISPLAY] Connecting LVGL to Linux Framebuffer (/dev/fb0)...\n");
+/* ============================================================
+ *  DISPLAY — LVGL bound to Linux Framebuffer
+ *
+ *  Uses LVGL's built-in fbdev driver which writes directly to
+ *  /dev/fb0. No X11, no Wayland, no GPU needed.
+ *
+ *  Ensure the Pi is NOT booting to desktop (use CLI boot in
+ *  raspi-config) so /dev/fb0 is free for us to use.
+ * ============================================================ */
 
-    /* 1. Initialize the LVGL core engine */
+int display_init(void) {
+    printf("[DISPLAY] Initialising LVGL...\n");
+
     lv_init();
 
-    /* 2. Create the display output using LVGL's built-in Linux framebuffer driver */
+    printf("[DISPLAY] Connecting to framebuffer /dev/fb1 (SunFounder SPI)...\n");
     lv_display_t *disp = lv_linux_fbdev_create();
     if (disp == NULL) {
-        printf("[FATAL] Failed to create LVGL display. Is your screen plugged in?\n");
+        printf("[DISPLAY] Failed to create fbdev display.\n");
+        printf("[DISPLAY] Is the screen connected? Is /dev/fb0 available?\n");
         return -1;
     }
 
-    /* 3. Point the engine at the Pi's raw framebuffer */
-    lv_linux_fbdev_set_file(disp, "/dev/fb0");
+    /* SunFounder 3.5" SPI display creates /dev/fb1 via the kernel overlay.
+     * (A plain HDMI display would be /dev/fb0 instead.) */
+    lv_linux_fbdev_set_file(disp, "/dev/fb1");
 
-    printf("[DISPLAY] Screen connected successfully.\n");
+    printf("[DISPLAY] Framebuffer display ready.\n");
     return 0;
 }
