@@ -74,6 +74,7 @@ int modem_init(const char* device_path) {
     /* Enable verbose error reporting */
     at_cmd(fd, "AT+CMEE=2\r\n", "OK", 200);
 
+    usleep(3000000); /* Wait for modem to fully register on network */
     /* Set SMS to text mode — do this once at init, not per-message */
     if (!at_cmd(fd, "AT+CMGF=1\r\n", "OK", 500)) {
         printf("[MODEM] Warning: Could not set SMS text mode.\n");

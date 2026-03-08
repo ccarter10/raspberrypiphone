@@ -21,8 +21,8 @@ NATIVE_CC = gcc
 CC        = $(CROSS_CC)
 
 # --- FLAGS ---
-CFLAGS  = -Wall -Wextra -O2 -I. -Ilvgl
-LDFLAGS = -lpthread -lm
+CFLAGS    = -Wall -Wextra -O2 -I. -Ilvgl $(shell pkg-config --cflags libdrm)
+LDFLAGS   = -lpthread -lm -ldrm
 
 # --- PROJECT SOURCES ---
 SRCS = main.c modem.c battery.c ui.c display.c touch.c
@@ -41,12 +41,14 @@ LVGL_TICK   = $(shell find lvgl/src/tick     -name '*.c' 2>/dev/null)
 LVGL_INDEV  = $(shell find lvgl/src/indev    -name '*.c' 2>/dev/null)
 LVGL_DISP   = $(shell find lvgl/src/display  -name '*.c' 2>/dev/null)
 # Linux-specific drivers (fbdev + evdev)
-LVGL_LINUX  = $(shell find lvgl/src/drivers/display/fb   -name '*.c' 2>/dev/null) \
-              $(shell find lvgl/src/drivers/evdev         -name '*.c' 2>/dev/null)
-
+LVGL_LINUX  = $(shell find lvgl/src/drivers/display/fb -name '*.c' 2>/dev/null) $(shell find lvgl/src/drivers/evdev -name '*.c' 2>/dev/null) $(shell find lvgl/src/drivers/display/drm -name '*.c' 2>/dev/null)
+LVGL_THEMES = $(shell find lvgl/src/themes -name '*.c' 2>/dev/null)
+LVGL_OSAL = $(shell find lvgl/src/osal -name '*.c' 2>/dev/null)
+LVGL_INIT = lvgl/src/lv_init.c
+LVGL_LIBS = $(shell find lvgl/src/libs/bin_decoder -name '*.c' 2>/dev/null)
 LVGL_SRCS = $(LVGL_CORE) $(LVGL_DRAW) $(LVGL_MISC) $(LVGL_FONT) \
             $(LVGL_LAYOUT) $(LVGL_WIDGET) $(LVGL_STDLIB) $(LVGL_TICK) \
-            $(LVGL_INDEV) $(LVGL_DISP) $(LVGL_LINUX)
+            $(LVGL_INDEV) $(LVGL_DISP) $(LVGL_LINUX) $(LVGL_THEMES) $(LVGL_OSAL) $(LVGL_INIT) $(LVGL_LIBS)
 
 ALL_SRCS = $(SRCS) $(LVGL_SRCS)
 
